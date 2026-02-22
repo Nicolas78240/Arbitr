@@ -1,0 +1,14 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_URL=https://arbitr-api-302282679184.europe-west1.run.app'
+      - '-f'
+      - 'docker/Dockerfile.web'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/arbitr/web:v1'
+      - '.'
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/arbitr/web:v1'

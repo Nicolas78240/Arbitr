@@ -1,4 +1,4 @@
-import { Role } from './enums';
+import { Role } from './enums.js';
 
 export interface JWTPayload {
   sub: string;

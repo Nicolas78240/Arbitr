@@ -1,0 +1,73 @@
+# ============================================================
+# Stage 1: Install dependencies and build
+# ============================================================
+FROM node:20-slim AS builder
+
+ENV CI=true
+
+RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
+
+# OpenSSL required by Prisma
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy workspace config files
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json tsconfig.base.json ./
+
+# Copy all package.json files for dependency resolution
+COPY apps/api/package.json apps/api/package.json
+COPY packages/types/package.json packages/types/package.json
+COPY packages/validation/package.json packages/validation/package.json
+COPY packages/scoring/package.json packages/scoring/package.json
+
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY packages/ packages/
+COPY apps/api/ apps/api/
+
+# Generate Prisma client
+RUN pnpm --filter @arbitr/api exec prisma generate
+
+# Build all packages
+RUN pnpm turbo build
+
+# ============================================================
+# Stage 2: Production image
+# ============================================================
+FROM node:20-slim AS runner
+
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 fastify
+
+WORKDIR /app
+
+# Copy entire built workspace (includes node_modules with Prisma client)
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy built packages
+COPY --from=builder /app/packages packages
+
+# Copy built API
+COPY --from=builder /app/apps/api apps/api
+
+# Create uploads directory
+RUN mkdir -p /app/apps/api/uploads && chown fastify:nodejs /app/apps/api/uploads
+
+USER fastify
+
+WORKDIR /app/apps/api
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["node", "dist/server.js"]

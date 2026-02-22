@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-f'
+      - 'docker/Dockerfile.api'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/arbitr/api:v2'
+      - '.'
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/arbitr/api:v2'

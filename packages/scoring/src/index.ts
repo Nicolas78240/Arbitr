@@ -1,2 +1,2 @@
-export * from './types';
-export * from './compute';
+export * from './types.js';
+export * from './compute.js';

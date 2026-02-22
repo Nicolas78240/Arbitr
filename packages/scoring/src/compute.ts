@@ -1,4 +1,4 @@
-import { CriterionScore, ProjectScoreInput, ProjectScores, RankedProject, QuadrantPosition } from './types';
+import { CriterionScore, ProjectScoreInput, ProjectScores, RankedProject, QuadrantPosition } from './types.js';
 
 /**
  * Compute average of an array of numbers.

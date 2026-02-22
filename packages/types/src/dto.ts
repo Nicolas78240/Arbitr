@@ -1,4 +1,4 @@
-import { SessionStatus, Axis, FieldType, QuadrantPosition } from './enums';
+import { SessionStatus, Axis, FieldType, QuadrantPosition } from './enums.js';
 
 export interface Session {
   id: string;
