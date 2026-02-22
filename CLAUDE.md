@@ -7,7 +7,7 @@ Arbitr is a configurable jury-based project selection platform. Multi-portal web
 ## Tech Stack
 
 - **Monorepo**: Turborepo with pnpm workspaces
-- **Frontend**: Next.js 14 (App Router) + Tailwind CSS + shadcn/ui + TanStack Query + Zustand
+- **Frontend**: Next.js 15 (App Router) + Tailwind CSS + shadcn/ui + TanStack Query + Zustand
 - **Backend**: Node.js + Fastify + Prisma ORM
 - **Database**: PostgreSQL 16 (Supabase — free tier)
 - **Language**: TypeScript strict everywhere
@@ -23,7 +23,7 @@ Arbitr is a configurable jury-based project selection platform. Multi-portal web
 arbitr/
 ├── apps/
 │   ├── api/          → Fastify backend (port 3001 local, 8080 prod)
-│   └── web/          → Next.js 14 frontend (port 3000 local, 8080 prod)
+│   └── web/          → Next.js 15 frontend (port 3000 local, 8080 prod)
 ├── packages/
 │   ├── types/        → Shared TypeScript DTOs & enums
 │   ├── validation/   → Shared Zod schemas
@@ -57,7 +57,6 @@ pnpm db:reset         # Reset DB + seed
 
 # Testing
 pnpm test             # Run all tests (Vitest)
-pnpm test:e2e         # Run Playwright E2E tests
 pnpm test:scoring     # Run scoring package tests
 
 # Linting & Types
