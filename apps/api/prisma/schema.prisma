@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SessionStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum Axis {
+  X
+  Y
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  SELECT
+  EMAIL
+  URL
+}
+
+model Session {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  status      SessionStatus @default(DRAFT)
+  adminCode   String
+  thresholdX  Float         @default(3.5)
+  thresholdY  Float         @default(3.5)
+  axisLabelX  String        @default("Valeur")
+  axisLabelY  String        @default("Maturité")
+
+  labelEvaluator String @default("Évaluateur")
+  labelTeam      String @default("Équipe")
+  labelProject   String @default("Projet")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  criteria   Criterion[]
+  evaluators Evaluator[]
+  teams      Team[]
+  fields     FormField[]
+  projects   Project[]
+  quadrants  Quadrant[]
+}
+
+model Quadrant {
+  id        String  @id @default(cuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  position  String // "top-right" | "top-left" | "bottom-right" | "bottom-left"
+  label     String
+  icon      String
+  color     String
+
+  @@unique([sessionId, position])
+}
+
+model Criterion {
+  id          String  @id @default(cuid())
+  sessionId   String
+  session     Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  axis        Axis
+  min         Int     @default(0)
+  max         Int     @default(5)
+  weight      Int // Weight %, sum per axis = 100
+  order       Int     @default(0)
+  scores      Score[]
+}
+
+model Evaluator {
+  id        String  @id @default(cuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  code      String // bcrypt hashed
+  scores    Score[]
+
+  @@unique([sessionId, code])
+}
+
+model Team {
+  id        String  @id @default(cuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  code      String // bcrypt hashed
+  project   Project?
+
+  @@unique([sessionId, code])
+}
+
+model FormField {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  label       String
+  placeholder String?
+  type        FieldType
+  required    Boolean  @default(false)
+  options     String[] @default([])
+  order       Int      @default(0)
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id])
+  teamId      String   @unique
+  team        Team     @relation(fields: [teamId], references: [id])
+  name        String
+  number      Int
+  formData    Json
+  fileUrl     String?
+  fileName    String?
+  submittedAt DateTime @default(now())
+  scores      Score[]
+}
+
+model Score {
+  id          String    @id @default(cuid())
+  evaluatorId String
+  evaluator   Evaluator @relation(fields: [evaluatorId], references: [id])
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id])
+  criterionId String
+  criterion   Criterion @relation(fields: [criterionId], references: [id])
+  value       Int?
+  comment     String?
+  submittedAt DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([evaluatorId, projectId, criterionId])
+}
+
+model User {
+  id         String   @id @default(cuid())
+  externalId String?  @unique
+  email      String?  @unique
+  name       String?
+  createdAt  DateTime @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  role      String
+  sessionId String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

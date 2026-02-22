@@ -7,6 +7,12 @@ dist/
 .next/
 .turbo/
 out/
+*.tsbuildinfo
+# Generated JS/DTS in source dirs (tsc output)
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
 
 # Environment
 .env
@@ -28,6 +34,9 @@ apps/api/prisma/migrations/*.sql.bak
 # OS
 .DS_Store
 Thumbs.db
+
+# Uploads
+uploads/
 
 # Logs
 *.log

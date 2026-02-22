@@ -1,0 +1,37 @@
+{
+  "name": "arbitr",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:api": "turbo dev --filter=@arbitr/api",
+    "dev:web": "turbo dev --filter=@arbitr/web",
+    "build": "turbo build",
+    "build:api": "turbo build --filter=@arbitr/api",
+    "build:web": "turbo build --filter=@arbitr/web",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:scoring": "turbo test --filter=@arbitr/scoring",
+    "db:migrate": "pnpm --filter @arbitr/api exec prisma migrate dev",
+    "db:generate": "pnpm --filter @arbitr/api exec prisma generate",
+    "db:seed": "pnpm --filter @arbitr/api exec prisma db seed",
+    "db:studio": "pnpm --filter @arbitr/api exec prisma studio",
+    "db:reset": "pnpm --filter @arbitr/api exec prisma migrate reset"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "bcrypt",
+      "esbuild",
+      "prisma"
+    ]
+  },
+  "devDependencies": {
+    "turbo": "^2.8.10"
+  }
+}
